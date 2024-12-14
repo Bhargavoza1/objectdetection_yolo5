@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend  # Adjust to the path of your backend directory
+      dockerfile: Dockerfile  # Ensure this points to your backend Dockerfile
+    environment:
+      - FLASK_APP=app.py
+    ports:
+      - "8080:8080"  # Expose backend on port 8080
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - app-network  # Custom network for communication between containers
+
+  frontend:
+    build:
+      context: ./frontend  # Adjust to the path of your frontend directory
+      dockerfile: Dockerfile  # Ensure this points to your frontend Dockerfile
+    ports:
+      - "80:80"  # Expose frontend on port 80
+    networks:
+      - app-network  # Same custom network as backend
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+    driver: bridge

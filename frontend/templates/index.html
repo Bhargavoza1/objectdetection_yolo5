@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 30px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            max-width: 800px;
+            width: 100%;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .image-placeholder {
+            flex: 1;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .detections {
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload an Image for Detection</h2>
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" id="image-input" name="image" accept="image/*" onchange="previewImage(event)">
+            <br>
+            <button type="submit">Upload</button>
+        </form>
+
+        <!-- Image Preview and Placeholders -->
+        <div class="image-container">
+            <div class="image-placeholder">
+                <h3>Original Image</h3>
+                <img id="image-preview" src="" alt="Original Image Preview" style="display: none;">
+            </div>
+            <div class="image-placeholder">
+                <h3>Processed Image</h3>
+                <img id="processed-image" src="" alt="Processed Image Preview" style="display: none;">
+            </div>
+        </div>
+
+        <!-- Detection Results -->
+        <div id="detection-results" class="detections" style="display: none;">
+            <h3>Detection Results (JSON):</h3>
+            <pre id="response-output"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Preview the selected image before upload
+        function previewImage(event) {
+            const imagePreview = document.getElementById('image-preview');
+            const processedImage = document.getElementById('processed-image');
+            const detectionResults = document.getElementById('detection-results');
+            const responseOutput = document.getElementById('response-output');
+
+            // Clear previous previews and results
+            imagePreview.style.display = 'none';
+            imagePreview.src = '';
+            processedImage.style.display = 'none';
+            processedImage.src = '';
+            detectionResults.style.display = 'none';
+            responseOutput.textContent = '';
+
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'block';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle the form submission using JavaScript (AJAX)
+        document.getElementById('upload-form').onsubmit = function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('image-input');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image');
+                return;
+            }
+
+            formData.append('image', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const detectionResults = document.getElementById('detection-results');
+                const responseOutput = document.getElementById('response-output');
+                const processedImage = document.getElementById('processed-image');
+
+                detectionResults.style.display = 'block';
+                responseOutput.textContent = JSON.stringify(data.detections, null, 2); // Pretty print the JSON response
+
+                // Display the processed image
+                if (data.processed_image) {
+                    processedImage.src = `data:image/jpeg;base64,${data.processed_image}`;
+                    processedImage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading image or receiving response.');
+            });
+        };
+    </script>
+</body>
+</html>
