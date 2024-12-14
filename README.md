@@ -1,3 +1,6 @@
+my original email: ozabhargav41@gmail.com
+mobile: +91 7567592803
+
 # objectdetection_yolo5
  
 # Technical Assessment: Image Upload and Object Detection System
