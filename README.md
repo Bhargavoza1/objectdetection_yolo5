@@ -26,7 +26,7 @@ This document outlines the development of a microservice consisting of two main 
     - Loads the YOLOv5 model.
     - Handles Base64 image uploads.
     - Outputs processed images and detection results.
-    - Tested API using Postman with payload format: {\"image\": <base encode image>}.
+    - Tested API using Postman with payload format: {\"image\": < base encode image >}.
 
 - **Frontend:**
   - `index.html`:
