@@ -5,6 +5,8 @@
 ## Project Overview
 This document outlines the development of a microservice consisting of two main components: a UI backend service and an AI backend service. The UI backend takes image input from the user, while the AI backend uses a lightweight open-source model for object detection, returning the results in a structured JSON format. The two components communicate seamlessly to provide a comprehensive solution to the user.
 
+![Example Output](exampleimage.png)
+
 ---
 
 ## Features
